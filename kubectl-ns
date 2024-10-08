@@ -80,10 +80,14 @@ list_namespaces() {
 
 # Set namespace of current context to a new namespace (from local cache)
 set_namespace() {
-  which fzf >/dev/null || { fzf_missing; exit 1; }
-  get_data
-  test_cache
-  local ns=$(print_namespaces | fzf -e | sed 's/^..//')
+  if [ -z "$1" ] ; then
+    which fzf >/dev/null || { fzf_missing; exit 1; }
+    get_data
+    test_cache
+    local ns=$(print_namespaces | fzf -e | sed 's/^..//')
+  else
+    ns=$1
+  fi
   if [[ -z "$ns" ]]; then
     echo "Aborted. Nothing has been changed."
   else
@@ -94,7 +98,8 @@ set_namespace() {
 
 case "$1" in
   "") set_namespace;;
+  -h) usage;;
   -l) list_namespaces;;
   -u) update_cache;;
-  *)  usage;;
+  *)  set_namespace $1;;
 esac
